@@ -266,11 +266,16 @@ export default function StackerCanvas({ onGameComplete, onBack, onOpenSettings, 
 
     lastDropTimeRef.current = now;
 
+    const canvas = canvasRef.current;
+    const W = canvas ? canvas.width : 400;
+    const currentBlockW = Math.min(115, Math.max(85, Math.floor(W * 0.28)));
+    const currentBlockH = currentBlockW;
+
     state.fallingBlock = {
       x: state.craneX,
       y: 110,
-      width: FIXED_BLOCK_WIDTH,
-      height: FIXED_BLOCK_HEIGHT,
+      width: currentBlockW,
+      height: currentBlockH,
       vy: 0,
       module: state.hangingBlock.module
     };
@@ -428,8 +433,12 @@ export default function StackerCanvas({ onGameComplete, onBack, onOpenSettings, 
         canvas.width = rect.width;
         canvas.height = rect.height;
         if (gameState.current.stackedBlocks.length === 1) {
-          gameState.current.stackedBlocks[0].x = canvas.width / 2;
-          gameState.current.stackedBlocks[0].y = canvas.height * 0.74;
+          const initW = canvas.width;
+          const initH = canvas.height;
+          gameState.current.stackedBlocks[0].x = initW / 2;
+          gameState.current.stackedBlocks[0].y = initH * 0.74;
+          gameState.current.stackedBlocks[0].width = Math.min(140, Math.max(100, Math.floor(initW * 0.34)));
+          gameState.current.stackedBlocks[0].height = Math.min(115, Math.max(85, Math.floor(initW * 0.28)));
         }
       }
 
@@ -490,9 +499,11 @@ export default function StackerCanvas({ onGameComplete, onBack, onOpenSettings, 
 
         // CALCULATE PHYSICS VALUES
         const physics = getHardModePhysics(state.floorsCount + 1);
+        const currentBlockW = Math.min(115, Math.max(85, Math.floor(W * 0.28)));
+        const currentBlockH = currentBlockW;
 
         state.craneAngle += physics.craneSpeed;
-        const swingAmplitude = W * 0.38;
+        const swingAmplitude = Math.min(W * 0.38, Math.max(75, (W - currentBlockW - 24) / 2));
         state.craneX = W / 2 + Math.sin(state.craneAngle) * swingAmplitude;
 
         // Lightweight crane speed motion trail
@@ -531,8 +542,8 @@ export default function StackerCanvas({ onGameComplete, onBack, onOpenSettings, 
               state.tumblingBlocks.push({
                 x: fb.x,
                 y: fb.y,
-                width: FIXED_BLOCK_WIDTH,
-                height: FIXED_BLOCK_HEIGHT,
+                width: fb.width,
+                height: fb.height,
                 vx: offset > 0 ? 5 : -5,
                 vy: -4,
                 angle: 0,
@@ -594,13 +605,13 @@ export default function StackerCanvas({ onGameComplete, onBack, onOpenSettings, 
               state.stackedBlocks.push({
                 x: fb.x,
                 y: fb.y,
-                width: FIXED_BLOCK_WIDTH,
-                height: FIXED_BLOCK_HEIGHT,
+                width: fb.width,
+                height: fb.height,
                 module: fb.module,
                 isPerfect
               });
 
-              state.targetCameraY = (state.floorsCount - 1) * FIXED_BLOCK_HEIGHT;
+              state.targetCameraY = (state.floorsCount - 1) * fb.height;
 
               setHudState({
                 floorsCount: state.floorsCount,

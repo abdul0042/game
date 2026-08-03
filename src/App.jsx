@@ -113,11 +113,11 @@ export default function App() {
   };
 
   return (
-    <div className="w-screen h-screen bg-slate-200 flex items-center justify-center overflow-hidden">
+    <div className="w-full h-full h-[100dvh] bg-slate-950 flex items-center justify-center overflow-hidden">
       <div 
         className={`relative overflow-hidden transition-all duration-300 ${
           settings.aspectMode === 'kiosk'
-            ? 'w-full max-w-[480px] h-full max-h-[920px] rounded-none sm:rounded-3xl border-0 sm:border-4 border-white shadow-[0_20px_60px_-15px_rgba(14,165,233,0.3)] bg-slate-50'
+            ? 'w-full h-full sm:max-w-[480px] sm:h-[96vh] sm:max-h-[920px] rounded-none sm:rounded-3xl border-0 sm:border-4 border-white/20 shadow-[0_20px_60px_-15px_rgba(14,165,233,0.3)] bg-slate-50'
             : 'w-full h-full bg-slate-50'
         }`}
       >
