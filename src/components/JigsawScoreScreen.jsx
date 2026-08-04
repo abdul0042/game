@@ -7,8 +7,8 @@ export default function JigsawScoreScreen({ scoreData, onReplay, onHome, onSaveS
 
   const { timeSeconds = 0, moves = 0, gridSize = '4×4', logoName = 'App Logo', score = 5000, wonPrize = null } = scoreData || {};
 
-  // Calculate Stars (3 Stars < 15s, 2 Stars < 30s, 1 Star >= 30s)
-  const stars = timeSeconds <= 15 ? 3 : timeSeconds <= 30 ? 2 : 1;
+  // Calculate Stars (3 Stars <= 20s, 2 Stars <= 45s, 1 Star > 45s)
+  const stars = timeSeconds <= 20 ? 3 : timeSeconds <= 45 ? 2 : 1;
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60);

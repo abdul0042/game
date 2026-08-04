@@ -14,11 +14,10 @@ import {
 } from 'lucide-react';
 import { soundManager } from '../utils/audioEngine';
 
-// Default App Logo Preset Options
+// Default App Logo Preset Options (GoWhats, Billzzy, Ciphergate, F3 Empire)
 const LOGO_PRESETS = [
   { id: 'gowhats', name: 'GoWhats', src: '/gowhats.webp' },
   { id: 'billzzy', name: 'Billzzy', src: '/billzzy.webp' },
-  { id: 'fynovo', name: 'Fynovo', src: '/fynovo.webp' },
   { id: 'ciphergate', name: 'Ciphergate', src: '/ciphergate_lo_go (1).webp' },
   { id: 'f3', name: 'F3 Empire', src: '/f3-icon.webp' }
 ];
@@ -42,8 +41,8 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
 
   const containerRef = useRef(null);
 
-  // Total Timer Duration = 30 seconds
-  const GAME_DURATION = 30;
+  // Total Timer Duration = 45 seconds
+  const GAME_DURATION = 45;
   const timeRemaining = Math.max(0, GAME_DURATION - elapsedTime);
 
   // Correctly Placed Count
@@ -221,19 +220,31 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
           />
         </g>
 
-        {/* Slightest Black Outline & Selection Highlight for High Visibility */}
+        {/* Solid Dark Black Jigsaw Cut Line Outline */}
         <path 
           d={pathD} 
           fill="none" 
-          stroke="rgba(15, 23, 42, 0.35)" 
-          strokeWidth={isSelected ? '3.5' : '2'} 
+          stroke="#090d16" 
+          strokeWidth={isSelected ? '3.5' : '2.2'} 
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
-        <path 
-          d={pathD} 
-          fill="none" 
-          stroke={isSelected ? '#10b981' : isCorrect ? '#059669' : 'rgba(30, 41, 59, 0.65)'} 
-          strokeWidth={isSelected ? '2.5' : isCorrect ? '1.5' : '1.2'} 
-        />
+        {isSelected && (
+          <path 
+            d={pathD} 
+            fill="none" 
+            stroke="#10b981" 
+            strokeWidth="2.5" 
+          />
+        )}
+        {isCorrect && !isSelected && (
+          <path 
+            d={pathD} 
+            fill="none" 
+            stroke="#059669" 
+            strokeWidth="1.8" 
+          />
+        )}
       </svg>
     );
   };
@@ -273,7 +284,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
         setIsTimerRunning(false);
         soundManager.playPuzzleCompleteSound();
 
-        const finishedUnder30 = elapsedTime < 30;
+        const finishedUnder45 = elapsedTime < 45;
 
         setTimeout(() => {
           onGameComplete({
@@ -282,7 +293,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
             moves: movesCount + 1,
             gridSize: gridConfig.label,
             logoName: currentLogo.name,
-            eligibleForPrize: finishedUnder30,
+            eligibleForPrize: finishedUnder45,
             score: Math.max(300, 15000 - elapsedTime * 30 - (movesCount + 1) * 20)
           });
         }, 800);
@@ -313,7 +324,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
               TIME'S UP! GAME OVER
             </h2>
             <p className="text-xs font-bold text-slate-500 mt-1 uppercase">
-              You ran out of time (30s) before solving the puzzle.
+              You ran out of time (45s) before solving the puzzle.
             </p>
 
             <div className="my-4 p-3 w-full rounded-2xl bg-slate-50 border border-slate-200 text-xs font-extrabold text-slate-700 flex justify-around shadow-inner">
@@ -333,7 +344,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
                 onClick={initPuzzle}
                 className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-rose-500 via-rose-600 to-amber-500 hover:brightness-110 active:scale-95 text-white font-black text-xs font-heading tracking-wider uppercase border border-rose-300 shadow-md flex items-center justify-center gap-2 transition-all"
               >
-                <RotateCcw className="w-4 h-4" /> Try Again (30s Reset)
+                <RotateCcw className="w-4 h-4" /> Try Again (45s Reset)
               </button>
 
               <button
@@ -420,7 +431,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
 
       {/* --- 2. ABOVE GAME: COMPACT REFERENCE IMAGE GUIDE CARD --- */}
       {showReference && (
-        <div className="relative z-10 shrink-0 w-36 sm:w-40 mx-auto my-0.5 p-2 bg-slate-100/90 backdrop-blur rounded-2xl shadow-md border border-slate-300/90 flex flex-col gap-1 text-center">
+        <div className="relative z-10 shrink-0 w-36 sm:w-40 mx-auto mt-2.5 mb-1.5 p-2 bg-slate-100/90 backdrop-blur rounded-2xl shadow-md border border-slate-300/90 flex flex-col gap-1 text-center">
           <div className="flex items-center justify-between px-0.5">
             <span className="text-[9px] font-black uppercase tracking-wider text-slate-800 flex items-center gap-1">
               <ImageIcon className="w-3 h-3 text-cyan-600" /> REFERENCE

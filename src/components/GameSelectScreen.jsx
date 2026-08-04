@@ -71,7 +71,7 @@ export default function GameSelectScreen({ onSelectStacker, onSelectJigsaw, onOp
           </p>
           
           <p className="text-xs text-slate-600 font-semibold leading-relaxed">
-            Piece together GoWhats, Billzzy, Fynovo, Ciphergate, and F3 Empire logos in custom grid difficulties!
+            Piece together GoWhats, Billzzy, Ciphergate, and F3 Empire logos in custom grid difficulties!
           </p>
         </button>
       </div>
