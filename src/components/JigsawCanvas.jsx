@@ -14,12 +14,12 @@ import {
 } from 'lucide-react';
 import { soundManager } from '../utils/audioEngine';
 
-// Default App Logo Preset Options (GoWhats, Billzzy, Ciphergate, F3 Empire)
+// Default App Logo Preset Options (GoWhats, Billzzy, CipherGate, F3 Engine)
 const LOGO_PRESETS = [
-  { id: 'gowhats', name: 'GoWhats', src: '/gowhats.webp' },
-  { id: 'billzzy', name: 'Billzzy', src: '/billzzy.webp' },
-  { id: 'ciphergate', name: 'Ciphergate', src: '/ciphergate_lo_go (1).webp' },
-  { id: 'f3', name: 'F3 Empire', src: '/f3-icon.webp' }
+  { id: 'gowhats', name: 'GoWhats', src: '/gowhats.webp', usage: 'WhatsApp-based checkout and customer engagement.' },
+  { id: 'billzzy', name: 'Billzzy', src: '/billzzy.webp', usage: 'Simple, reliable billing for your business.' },
+  { id: 'ciphergate', name: 'CipherGate', src: '/ciphergate_lo_go (1).webp', usage: 'Secure gateway for your business data.' },
+  { id: 'f3', name: 'F3 Engine', src: '/f3-icon.webp', usage: 'The backend engine powering core operations.' }
 ];
 
 export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenSettings }) {
@@ -153,7 +153,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
       const d = right;
       path += `L ${w} ${h * 0.35} `;
       path += `C ${w + d * tabH * 0.8} ${h * 0.35}, ${w + d * tabH * 1.25} ${h * 0.42}, ${w + d * tabH * 1.25} ${h * 0.5} `;
-      path += `C ${w + d * tabH * 1.25} ${h * 0.58}, ${w + d * tabH * 0.8} ${h * 0.65}, ${w} ${h * 0.65} `;
+      path += `C ${w + d * tabH * 1.25} ${h * 0.58}, ${w + d * tabH * 0.8} ${h * 0.65}, ${w} ${h} `;
       path += `L ${w} ${h} `;
     }
 
@@ -197,7 +197,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
         viewBox="0 0 100 100" 
         className={`w-full h-full overflow-visible pointer-events-none transition-all duration-200 ${
           isSelected 
-            ? 'filter drop-shadow-[0_0_12px_rgba(16,185,129,0.9)] scale-105 z-30' 
+            ? 'filter drop-shadow-[0_0_15px_rgba(16,185,129,0.95)] scale-105 z-30' 
             : isCorrect 
             ? 'filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]' 
             : 'filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.15)] opacity-95'
@@ -254,7 +254,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
     if (isGameOver) return;
     soundManager.init();
 
-    // Start 30s Countdown timer on first interaction
+    // Start 45s Countdown timer on first interaction
     if (!isTimerRunning) {
       setIsTimerRunning(true);
     }
@@ -310,7 +310,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-full h-[100dvh] flex flex-col justify-between p-2.5 bg-gradient-to-br from-slate-200 via-sky-100/70 to-emerald-100/60 text-slate-900 font-sans select-none overflow-hidden"
+      className="relative w-full h-full h-[100dvh] flex flex-col justify-between p-2.5 bg-gradient-to-b from-emerald-50/70 via-white to-teal-50/60 text-slate-900 font-sans select-none overflow-hidden"
     >
       {/* --- GAME OVER MODAL OVERLAY --- */}
       {isGameOver && (
@@ -327,22 +327,22 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
               You ran out of time (45s) before solving the puzzle.
             </p>
 
-            <div className="my-4 p-3 w-full rounded-2xl bg-slate-50 border border-slate-200 text-xs font-extrabold text-slate-700 flex justify-around shadow-inner">
+            <div className="my-4 p-3 w-full rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-extrabold text-emerald-900 flex justify-around shadow-inner">
               <div>
-                <span className="block text-[10px] text-slate-400 font-sans uppercase">Solved</span>
+                <span className="block text-[10px] text-emerald-700 font-sans uppercase">Solved</span>
                 <span className="text-base text-emerald-600 font-mono font-black">{correctCount} / {gridConfig.total}</span>
               </div>
-              <div className="w-[1px] h-8 bg-slate-200" />
+              <div className="w-[1px] h-8 bg-emerald-200" />
               <div>
-                <span className="block text-[10px] text-slate-400 font-sans uppercase">Moves</span>
-                <span className="text-base text-sky-700 font-mono font-black">{movesCount}</span>
+                <span className="block text-[10px] text-emerald-700 font-sans uppercase">Moves</span>
+                <span className="text-base text-teal-700 font-mono font-black">{movesCount}</span>
               </div>
             </div>
 
             <div className="w-full flex flex-col gap-2">
               <button
                 onClick={initPuzzle}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-rose-500 via-rose-600 to-amber-500 hover:brightness-110 active:scale-95 text-white font-black text-xs font-heading tracking-wider uppercase border border-rose-300 shadow-md flex items-center justify-center gap-2 transition-all"
+                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-95 text-white font-black text-xs font-heading tracking-wider uppercase border border-emerald-300 shadow-md flex items-center justify-center gap-2 transition-all"
               >
                 <RotateCcw className="w-4 h-4" /> Try Again (45s Reset)
               </button>
@@ -358,31 +358,22 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
         </div>
       )}
 
-      {/* --- 1. TOP: HEADER BAR --- */}
+      {/* --- 1. TOP: HEADER BAR (LUXURY GLASS ARCHITECTURE) --- */}
       <div className="relative z-20 w-full shrink-0">
-        <div className="w-full p-2 px-3 bg-slate-100/90 backdrop-blur-md rounded-full border border-slate-300/80 shadow-sm flex items-center justify-between gap-2 overflow-hidden">
+        <div className="w-full p-2 px-3.5 luxury-glass-card rounded-full flex items-center justify-between gap-2 overflow-hidden">
           {/* Left: Circular Back Button */}
           <button 
             onClick={onBack}
-            className="p-1.5 rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-700 transition-all active:scale-95 border border-slate-300 shrink-0"
+            className="p-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition-all active:scale-95 border border-emerald-200 shrink-0"
             title="Back"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
 
-          {/* Center: Title & Countdown / Moves Badge */}
-          <div className="flex flex-col items-center text-center">
-            <h1 className="text-xs font-black tracking-wide text-slate-900 flex items-center gap-1 uppercase font-heading">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> LOGO JIGSAW
-            </h1>
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-200/80 text-[10px] font-extrabold font-mono text-emerald-800 border border-slate-300">
-              <span>Countdown <strong className={timeRemaining <= 5 && isTimerRunning ? 'text-rose-600 font-black animate-ping' : 'text-emerald-800 font-black'}>{formatTime(timeRemaining)}</strong></span>
-              <span className="text-slate-400">|</span>
-              <span>Moves <strong className="text-sky-800 font-black">{movesCount}</strong></span>
-              <span className="text-slate-400">|</span>
-              <span className="text-emerald-800 font-black">{correctCount}/{gridConfig.total}</span>
-            </div>
-          </div>
+          {/* Center: Clean Title */}
+          <h1 className="text-xs sm:text-sm font-black tracking-wider text-emerald-950 flex items-center gap-1.5 uppercase font-heading">
+            <Sparkles className="w-4 h-4 text-emerald-600 animate-spin" /> LOGO JIGSAW
+          </h1>
 
           {/* Right: Circular Action Buttons */}
           <div className="flex items-center gap-1 shrink-0">
@@ -390,8 +381,8 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
               onClick={() => setShowReference(!showReference)}
               className={`p-1.5 rounded-full border transition-all ${
                 showReference 
-                  ? 'bg-cyan-200/80 border-cyan-400 text-cyan-900 shadow-sm' 
-                  : 'bg-slate-200/80 border-slate-300 text-slate-600'
+                  ? 'bg-emerald-100 border-emerald-400 text-emerald-900 shadow-sm' 
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-600'
               }`}
               title="Toggle Guide"
             >
@@ -402,8 +393,8 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
               onClick={() => setShowGhost(!showGhost)}
               className={`p-1.5 rounded-full border transition-all ${
                 showGhost 
-                  ? 'bg-emerald-200/80 border-emerald-400 text-emerald-900 shadow-sm' 
-                  : 'bg-slate-200/80 border-slate-300 text-slate-600'
+                  ? 'bg-emerald-100 border-emerald-400 text-emerald-900 shadow-sm' 
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-600'
               }`}
               title="Toggle Hint"
             >
@@ -412,7 +403,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
 
             <button
               onClick={initPuzzle}
-              className="p-1.5 rounded-full bg-slate-200/80 hover:bg-slate-300 border border-slate-300 text-slate-700 transition-all active:rotate-180 duration-300"
+              className="p-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 transition-all active:rotate-180 duration-300"
               title="Reset"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -420,7 +411,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
 
             <button
               onClick={onOpenSettings}
-              className="p-1.5 rounded-full bg-slate-200/80 hover:bg-slate-300 border border-slate-300 text-slate-700 transition-all"
+              className="p-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 transition-all"
               title="Settings"
             >
               <Settings className="w-3.5 h-3.5" />
@@ -429,37 +420,54 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
         </div>
       </div>
 
-      {/* --- 2. ABOVE GAME: COMPACT REFERENCE IMAGE GUIDE CARD --- */}
-      {showReference && (
-        <div className="relative z-10 shrink-0 w-36 sm:w-40 mx-auto mt-2.5 mb-1.5 p-2 bg-slate-100/90 backdrop-blur rounded-2xl shadow-md border border-slate-300/90 flex flex-col gap-1 text-center">
-          <div className="flex items-center justify-between px-0.5">
-            <span className="text-[9px] font-black uppercase tracking-wider text-slate-800 flex items-center gap-1">
-              <ImageIcon className="w-3 h-3 text-cyan-600" /> REFERENCE
-            </span>
-            <span className="text-[8px] font-extrabold text-emerald-800 bg-emerald-200/80 px-1.5 py-0.2 rounded-full border border-emerald-300">
-              Target Guide
+      {/* --- 2. ABOVE GAME: TIMER & STATS BADGE + REFERENCE GUIDE CARD --- */}
+      <div className="relative z-10 shrink-0 w-full max-w-xs mx-auto mt-1 mb-1 flex flex-col items-center gap-1">
+        {/* Free-Floating Large Countdown Timer & Solved Subtext ABOVE Reference Image */}
+        <div className="flex flex-col items-center text-center">
+          <div className="flex items-center gap-1.5 text-emerald-950 font-mono font-black text-2xl sm:text-3xl tracking-tight drop-shadow-xs">
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 inline" />
+            <span className={timeRemaining <= 5 && isTimerRunning ? 'text-rose-600 font-black animate-ping' : 'text-emerald-900 font-black'}>
+              {formatTime(timeRemaining)}
             </span>
           </div>
-
-          <div className="relative aspect-square w-full rounded-xl bg-slate-200/70 overflow-hidden border border-slate-300 p-1 flex items-center justify-center">
-            <img 
-              src={currentLogo.src} 
-              alt="Reference Target" 
-              className="w-full h-full object-contain p-0.5"
-            />
-            <div className="absolute bottom-0.5 left-0.5 right-0.5 px-1 py-0.2 rounded-md bg-slate-100/95 text-center text-[8px] font-extrabold text-slate-800 shadow-xs border border-slate-300">
-              {gridConfig.label} Solved
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- 3. CENTER GAME: SWAP JIGSAW PUZZLE BOARD MATRIX --- */}
-      <div className="relative z-10 flex-1 min-h-0 flex items-center justify-center my-0.5">
-        <div className="relative h-full max-h-[250px] sm:max-h-[280px] aspect-square bg-slate-200/90 backdrop-blur rounded-3xl p-2.5 border-2 border-slate-300/90 shadow-xl flex items-center justify-center overflow-hidden">
           
-          {/* Board Outer Container */}
-          <div className="relative w-full h-full overflow-hidden rounded-2xl bg-slate-300/60 border border-slate-400/60 shadow-inner">
+          <span className="text-[10px] sm:text-xs font-black text-emerald-800 tracking-wider uppercase font-sans">
+            {correctCount} / {gridConfig.total} SOLVED
+          </span>
+        </div>
+
+        {/* Reference Guide Image Card */}
+        {showReference && (
+          <div className="w-48 sm:w-52 p-2.5 luxury-glass-card rounded-2xl flex flex-col items-center gap-1.5 text-center shadow-md">
+            <div className="relative aspect-square w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-xl bg-emerald-50/60 overflow-hidden border border-emerald-200 p-1 flex items-center justify-center">
+              <img 
+                src={currentLogo.src} 
+                alt={currentLogo.name} 
+                className="w-full h-full object-contain p-0.5"
+              />
+            </div>
+
+            {/* App Usage Text Below Image */}
+            {currentLogo.usage && (
+              <div className="w-full px-2 py-1 rounded-xl bg-emerald-50/90 border border-emerald-200 text-center">
+                <p className="text-[10px] font-black text-emerald-950 uppercase tracking-tight">
+                  {currentLogo.name}
+                </p>
+                <p className="text-[8.5px] font-bold text-emerald-800 leading-tight mt-0.5">
+                  "{currentLogo.usage}"
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* --- 3. CENTER GAME: SWAP JIGSAW PUZZLE BOARD MATRIX (LUXURY GLASS BOARD) --- */}
+      <div className="relative z-10 flex-1 min-h-0 flex items-center justify-center my-0.5">
+        <div className="relative h-full max-h-[250px] sm:max-h-[280px] aspect-square luxury-glass-card rounded-[32px] p-2.5 border-2 border-emerald-300/80 shadow-2xl flex items-center justify-center overflow-hidden">
+          
+          {/* Board Matrix Inner Container */}
+          <div className="relative w-full h-full overflow-hidden rounded-2xl bg-emerald-50/60 border border-emerald-200/80">
 
             {/* Target Ghost Hint Image */}
             {showGhost && (
@@ -519,8 +527,8 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
       </div>
 
       {/* --- 4. BOTTOM INSTRUCTION BAR --- */}
-      <div className="relative z-20 shrink-0 w-full max-w-sm mx-auto p-2 bg-slate-100/90 backdrop-blur rounded-2xl shadow-md border border-slate-300 text-center">
-        <p className="text-[10px] sm:text-xs font-black text-slate-800 uppercase tracking-wide flex items-center justify-center gap-1.5">
+      <div className="relative z-20 shrink-0 w-full max-w-sm mx-auto p-2 luxury-glass-card rounded-2xl text-center">
+        <p className="text-[10px] sm:text-xs font-black text-emerald-900 uppercase tracking-wide flex items-center justify-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-spin" /> Tap one piece, then tap another to swap them!
         </p>
       </div>

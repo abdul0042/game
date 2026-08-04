@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Sliders, Monitor, Volume2, Trash2, Gamepad2, Building2, Puzzle, LayoutGrid, Grid } from 'lucide-react';
+import { X, Sliders, Monitor, Volume2, Trash2, Gamepad2, Building2, Puzzle, LayoutGrid, Grid, Home } from 'lucide-react';
 
 export default function SettingsModal({ 
   settings, 
@@ -13,11 +13,11 @@ export default function SettingsModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-md flex flex-col rounded-3xl bg-white border-2 border-sky-400 p-6 shadow-2xl">
+      <div className="relative w-full max-w-md flex flex-col rounded-3xl bg-white border-2 border-emerald-300 p-6 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
           <div className="flex items-center gap-2">
-            <Sliders className="w-6 h-6 text-sky-600" />
+            <Sliders className="w-6 h-6 text-emerald-600" />
             <h3 className="text-xl font-black font-heading text-slate-900 uppercase tracking-wide">
               KIOSK & GAME SETTINGS
             </h3>
@@ -33,9 +33,9 @@ export default function SettingsModal({
         {/* Settings Options */}
         <div className="flex flex-col gap-5 text-left">
           {/* MORE GAMES SECTION */}
-          <div className="flex flex-col gap-2 p-3.5 rounded-2xl bg-gradient-to-r from-sky-500/10 via-amber-400/20 to-purple-500/10 border-2 border-sky-400 shadow-sm">
-            <label className="text-xs font-black text-sky-900 uppercase flex items-center gap-2">
-              <Gamepad2 className="w-4 h-4 text-sky-600" /> SWITCH KIOSK GAME
+          <div className="flex flex-col gap-2 p-3.5 rounded-2xl bg-emerald-50/80 border-2 border-emerald-300 shadow-sm">
+            <label className="text-xs font-black text-emerald-900 uppercase flex items-center gap-2">
+              <Gamepad2 className="w-4 h-4 text-emerald-600" /> SWITCH KIOSK GAME
             </label>
 
             <div className="grid grid-cols-2 gap-3">
@@ -47,11 +47,11 @@ export default function SettingsModal({
                 }}
                 className={`py-3 px-3 rounded-xl text-center flex flex-col items-center gap-1 border transition-all ${
                   currentScreen?.includes('STACKER')
-                    ? 'border-sky-500 bg-sky-100 text-sky-900 font-black shadow-sm'
+                    ? 'border-emerald-500 bg-emerald-100 text-emerald-900 font-black shadow-sm'
                     : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 font-bold'
                 }`}
               >
-                <Building2 className="w-5 h-5 text-sky-600" />
+                <Building2 className="w-5 h-5 text-emerald-600" />
                 <span className="text-xs leading-tight uppercase font-extrabold">Tower Stacker</span>
               </button>
 
@@ -63,27 +63,25 @@ export default function SettingsModal({
                 }}
                 className={`py-3 px-3 rounded-xl text-center flex flex-col items-center gap-1 border transition-all ${
                   currentScreen?.includes('JIGSAW')
-                    ? 'border-purple-500 bg-purple-100 text-purple-900 font-black shadow-sm'
+                    ? 'border-emerald-500 bg-emerald-100 text-emerald-900 font-black shadow-sm'
                     : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 font-bold'
                 }`}
               >
-                <Puzzle className="w-5 h-5 text-purple-600" />
+                <Puzzle className="w-5 h-5 text-emerald-600" />
                 <span className="text-xs leading-tight uppercase font-extrabold">Logo Jigsaw</span>
               </button>
             </div>
 
-            {onSwitchToSelect && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onSwitchToSelect();
-                }}
-                className="w-full mt-1 py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all"
-              >
-                <LayoutGrid className="w-3.5 h-3.5 text-sky-400" /> Back to Game Select Menu
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                if (onSwitchToSelect) onSwitchToSelect();
+              }}
+              className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+            >
+              <Home className="w-4 h-4" /> Go to Home Screen (Game Select)
+            </button>
           </div>
 
           {/* JIGSAW GRID SIZE SETTING */}

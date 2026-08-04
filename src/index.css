@@ -14,8 +14,8 @@
 
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: #f4fbf7;
+    color: #064e3b;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
@@ -34,6 +34,20 @@
   font-family: 'Outfit', sans-serif;
 }
 
+/* Luxury Glassmorphism & Depth Utility Classes */
+.luxury-glass-card {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  box-shadow: 0 20px 50px -12px rgba(16, 185, 129, 0.14), 0 4px 15px -3px rgba(0, 0, 0, 0.03);
+}
+
+.luxury-glass-card:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 25px 60px -10px rgba(16, 185, 129, 0.22), 0 8px 20px -4px rgba(0, 0, 0, 0.05);
+}
+
 /* Custom Micro-Animations */
 @keyframes floatSlow {
   0%, 100% { transform: translateY(0px); }
@@ -41,8 +55,8 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.04); }
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.05); }
 }
 
 @keyframes shimmerLine {
@@ -50,18 +64,12 @@
   100% { transform: translateX(200%); }
 }
 
-@keyframes scalePop {
-  0% { transform: scale(0.95); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
-
 .animate-float-slow {
   animation: floatSlow 3.5s ease-in-out infinite;
 }
 
 .animate-pulse-glow {
-  animation: pulseGlow 2.5s ease-in-out infinite;
+  animation: pulseGlow 3s ease-in-out infinite;
 }
 
 .animate-shimmer {
@@ -74,9 +82,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 50%;
+  width: 60%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
   transform: translateX(-100%);
 }
 
@@ -84,21 +92,15 @@
   animation: shimmerLine 1.2s ease-in-out;
 }
 
-/* Vibrant Light Text Gradients */
-.text-gradient-emerald {
-  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+/* Luxury Metallic & Emerald Text Gradients */
+.text-gradient-luxury {
+  background: linear-gradient(135deg, #022c22 0%, #047857 50%, #059669 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-purple {
-  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #c084fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-sky {
-  background: linear-gradient(135deg, #0284c7 0%, #06b6d4 50%, #38bdf8 100%);
+.text-gradient-gold {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -109,12 +111,12 @@
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(241, 245, 249, 0.8);
+  background: rgba(240, 253, 244, 0.8);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(16, 185, 129, 0.3);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.6);
+  background: rgba(16, 185, 129, 0.6);
 }
