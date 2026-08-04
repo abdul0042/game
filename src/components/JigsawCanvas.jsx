@@ -16,10 +16,10 @@ import { soundManager } from '../utils/audioEngine';
 
 // Default App Logo Preset Options (GoWhats, Billzzy, CipherGate, F3 Engine)
 const LOGO_PRESETS = [
-  { id: 'gowhats', name: 'GoWhats', src: '/gowhats.webp', usage: 'WhatsApp-based checkout and customer engagement.' },
-  { id: 'billzzy', name: 'Billzzy', src: '/billzzy.webp', usage: 'Simple, reliable billing for your business.' },
-  { id: 'ciphergate', name: 'CipherGate', src: '/ciphergate_lo_go (1).webp', usage: 'Secure gateway for your business data.' },
-  { id: 'f3', name: 'F3 Engine', src: '/f3-icon.webp', usage: 'The backend engine powering core operations.' }
+  { id: 'gowhats', name: 'GoWhats', src: '/gowhats.png', usage: 'WhatsApp-based checkout and customer engagement.', scale: 1.4 },
+  { id: 'billzzy', name: 'Billzzy', src: '/billzzy.png', usage: 'Simple, reliable billing for your business.', scale: 1.22 },
+  { id: 'ciphergate', name: 'CipherGate', src: '/ciphergate logo.png', usage: 'Secure gateway for your business data.' },
+  { id: 'f3', name: 'F3 Engine', src: '/f3-icon.png', usage: 'The backend engine powering core operations.' }
 ];
 
 export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenSettings }) {
@@ -38,6 +38,9 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+
+  const [invalidSlot, setInvalidSlot] = useState(null);
+  const [incompatibleToast, setIncompatibleToast] = useState(false);
 
   const containerRef = useRef(null);
 
@@ -78,6 +81,33 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
     return () => clearInterval(interval);
   }, [isTimerRunning, isGameOver, elapsedTime]);
 
+  // Edge Shape Compatibility Checker for Border & Corner Slots
+  const isPieceCompatibleWithSlot = (piece, slotIdx, rows, cols) => {
+    if (!piece) return true;
+
+    const slotRow = Math.floor(slotIdx / cols);
+    const slotCol = slotIdx % cols;
+    const { top, right, bottom, left } = piece.edges;
+
+    // Top edge constraint: Top row MUST have top===0, non-top rows MUST NOT have top===0
+    if (slotRow === 0 && top !== 0) return false;
+    if (slotRow > 0 && top === 0) return false;
+
+    // Bottom edge constraint: Bottom row MUST have bottom===0, non-bottom rows MUST NOT have bottom===0
+    if (slotRow === rows - 1 && bottom !== 0) return false;
+    if (slotRow < rows - 1 && bottom === 0) return false;
+
+    // Left edge constraint: Left col MUST have left===0, non-left cols MUST NOT have left===0
+    if (slotCol === 0 && left !== 0) return false;
+    if (slotCol > 0 && left === 0) return false;
+
+    // Right edge constraint: Right col MUST have right===0, non-right cols MUST NOT have right===0
+    if (slotCol === cols - 1 && right !== 0) return false;
+    if (slotCol < cols - 1 && right === 0) return false;
+
+    return true;
+  };
+
   const initPuzzle = () => {
     // Pick random logo
     const randomLogo = LOGO_PRESETS[Math.floor(Math.random() * LOGO_PRESETS.length)];
@@ -113,13 +143,71 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
       }
     }
 
-    // Shuffle pieces across slots (ensure at least 50% are misplaced on start)
-    let shuffled = [...createdPieces].sort(() => Math.random() - 0.5);
-    while (shuffled.filter((p, idx) => p.id === idx).length > total * 0.4) {
-      shuffled = [...createdPieces].sort(() => Math.random() - 0.5);
+    // Categorize pieces & slots into compatible edge groups (Corners, Top Edge, Bottom Edge, Left Edge, Right Edge, Inner)
+    const boardMatrix = new Array(total).fill(null);
+
+    // Helper: Shuffle array in place
+    const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
+
+    // Group slots and pieces into 3 main categories: CORNERS, BORDER, and INNER
+    const categories = {
+      CORNERS: { slots: [], pieces: [] },
+      BORDER: { slots: [], pieces: [] },
+      INNER: { slots: [], pieces: [] }
+    };
+
+    for (let idx = 0; idx < total; idx++) {
+      const piece = createdPieces[idx];
+      const r = Math.floor(idx / cols);
+      const c = idx % cols;
+
+      const isCorner = (r === 0 || r === rows - 1) && (c === 0 || c === cols - 1);
+      const isBorder = !isCorner && (r === 0 || r === rows - 1 || c === 0 || c === cols - 1);
+
+      if (isCorner) {
+        categories.CORNERS.slots.push(idx);
+        categories.CORNERS.pieces.push(piece);
+      } else if (isBorder) {
+        categories.BORDER.slots.push(idx);
+        categories.BORDER.pieces.push(piece);
+      } else {
+        categories.INNER.slots.push(idx);
+        categories.INNER.pieces.push(piece);
+      }
     }
 
-    setBoardSlots(shuffled);
+    // Populate board slots with a guaranteed 0% solved start (0 checkmarks on init!)
+    Object.values(categories).forEach(({ slots, pieces }) => {
+      if (pieces.length === 0) return;
+
+      let shuffledPieces = [...pieces].sort(() => Math.random() - 0.5);
+
+      let attempts = 0;
+      // Keep shuffling until EVERY piece in this group is misplaced (0 start solved!) AND physically compatible
+      while (
+        attempts < 250 &&
+        (shuffledPieces.some((p, i) => p.id === slots[i]) ||
+         shuffledPieces.some((p, i) => !isPieceCompatibleWithSlot(p, slots[i], rows, cols)))
+      ) {
+        shuffledPieces = [...pieces].sort(() => Math.random() - 0.5);
+        attempts++;
+      }
+
+      // Fallback: If random derangement didn't achieve 0 solved, shift array offset by 1
+      if (shuffledPieces.some((p, i) => p.id === slots[i])) {
+        const shifted = [];
+        for (let i = 0; i < pieces.length; i++) {
+          shifted.push(pieces[(i + 1) % pieces.length]);
+        }
+        shuffledPieces = shifted;
+      }
+
+      slots.forEach((slotIdx, i) => {
+        boardMatrix[slotIdx] = shuffledPieces[i];
+      });
+    });
+
+    setBoardSlots(boardMatrix);
     setElapsedTime(0);
     setMovesCount(0);
     setSelectedSlot(null);
@@ -192,6 +280,13 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
     const clipId = `jigsaw-swap-clip-${piece.id}-${rows}x${cols}`;
     const isCorrect = piece.id === currentSlotIdx;
 
+    // Support custom zoom/scale factor for preset logos
+    const imgScale = currentLogo.scale || 1.0;
+    const totalW = cols * tileW * imgScale;
+    const totalH = rows * tileH * imgScale;
+    const imgX = -piece.col * tileW - (totalW - cols * tileW) / 2;
+    const imgY = -piece.row * tileH - (totalH - rows * tileH) / 2;
+
     return (
       <svg 
         viewBox="0 0 100 100" 
@@ -210,12 +305,20 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
         </defs>
 
         <g clipPath={`url(#${clipId})`}>
-          <image 
-            href={currentLogo.src} 
+          {/* Crisp Pure White Background for transparent PNG logos */}
+          <rect 
             x={-piece.col * tileW} 
             y={-piece.row * tileH} 
             width={cols * tileW} 
             height={rows * tileH} 
+            fill="#ffffff" 
+          />
+          <image 
+            href={currentLogo.src} 
+            x={imgX} 
+            y={imgY} 
+            width={totalW} 
+            height={totalH} 
             preserveAspectRatio="none"
           />
         </g>
@@ -267,6 +370,28 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
       // Deselect same piece
       setSelectedSlot(null);
     } else {
+      // Enforce Border & Corner Edge Shape Compatibility!
+      const pieceA = boardSlots[selectedSlot];
+      const pieceB = boardSlots[slotIdx];
+
+      const isAValidInB = isPieceCompatibleWithSlot(pieceA, slotIdx, gridConfig.rows, gridConfig.cols);
+      const isBValidInA = isPieceCompatibleWithSlot(pieceB, selectedSlot, gridConfig.rows, gridConfig.cols);
+
+      if (!isAValidInB || !isBValidInA) {
+        // Incompatible placement attempt! Reject swap & trigger warning feedback
+        setInvalidSlot(slotIdx);
+        setIncompatibleToast(true);
+        soundManager.playRedGateSound(false);
+
+        setTimeout(() => {
+          setInvalidSlot(null);
+          setIncompatibleToast(false);
+        }, 900);
+
+        setSelectedSlot(null);
+        return;
+      }
+
       // Swap pieces between selectedSlot and slotIdx!
       const newSlots = [...boardSlots];
       const temp = newSlots[selectedSlot];
@@ -439,11 +564,11 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
         {/* Reference Guide Image Card */}
         {showReference && (
           <div className="w-48 sm:w-52 p-2.5 luxury-glass-card rounded-2xl flex flex-col items-center gap-1.5 text-center shadow-md">
-            <div className="relative aspect-square w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-xl bg-emerald-50/60 overflow-hidden border border-emerald-200 p-1 flex items-center justify-center">
+            <div className="relative aspect-square w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-xl bg-white overflow-hidden border border-emerald-200 p-1 flex items-center justify-center shadow-xs">
               <img 
                 src={currentLogo.src} 
                 alt={currentLogo.name} 
-                className="w-full h-full object-contain p-0.5"
+                className={`w-full h-full object-contain p-0.5 transition-transform ${currentLogo.scale ? 'scale-125' : ''}`}
               />
             </div>
 
@@ -490,13 +615,14 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
                 if (!piece) return null;
                 const isSelected = selectedSlot === slotIdx;
                 const isCorrect = piece.id === slotIdx;
+                const isInvalid = invalidSlot === slotIdx;
 
                 return (
                   <div 
                     key={slotIdx}
                     onClick={() => handleSlotTap(slotIdx)}
                     className={`relative w-full h-full overflow-visible cursor-pointer transition-transform duration-150 ${
-                      isSelected ? 'z-30 scale-105' : 'hover:scale-[1.02]'
+                      isSelected ? 'z-30 scale-105' : isInvalid ? 'z-40 scale-105 animate-bounce' : 'hover:scale-[1.02]'
                     }`}
                   >
                     {/* SVG Vector Jigsaw Piece Tile */}
@@ -507,7 +633,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
                     />
 
                     {/* Green Checkmark Badge when Tile is in Correct Position */}
-                    {isCorrect && (
+                    {isCorrect && !isSelected && (
                       <div className="absolute top-1 right-1 z-20 p-0.5 rounded-full bg-emerald-600 text-white shadow-sm pointer-events-none animate-fade-in">
                         <CheckCircle2 className="w-3 h-3" />
                       </div>
@@ -516,6 +642,11 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
                     {/* Selection Active Ring */}
                     {isSelected && (
                       <div className="absolute inset-0 z-20 rounded-lg border-2 border-emerald-500 bg-emerald-500/10 pointer-events-none animate-pulse" />
+                    )}
+
+                    {/* Invalid Placement Rejection Ring */}
+                    {isInvalid && (
+                      <div className="absolute inset-0 z-20 rounded-lg border-2 border-rose-500 bg-rose-500/20 pointer-events-none animate-pulse" />
                     )}
                   </div>
                 );
@@ -528,6 +659,11 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
 
       {/* --- 4. BOTTOM INSTRUCTION BAR --- */}
       <div className="relative z-20 shrink-0 w-full max-w-sm mx-auto p-2 luxury-glass-card rounded-2xl text-center">
+        {incompatibleToast && (
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1.5 rounded-full bg-rose-600 text-white text-[10px] font-extrabold uppercase tracking-wide shadow-lg animate-bounce shrink-0 whitespace-nowrap">
+            ⚠️ Incompatible Piece: Corner/border shapes must fit!
+          </div>
+        )}
         <p className="text-[10px] sm:text-xs font-black text-emerald-900 uppercase tracking-wide flex items-center justify-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-spin" /> Tap one piece, then tap another to swap them!
         </p>
