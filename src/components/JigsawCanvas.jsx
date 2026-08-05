@@ -38,20 +38,18 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
-
-  const [invalidSlot, setInvalidSlot] = useState(null);
-  const [incompatibleToast, setIncompatibleToast] = useState(false);
+  const [isVictoryAnimating, setIsVictoryAnimating] = useState(false);
 
   const containerRef = useRef(null);
 
-  // Total Timer Duration = 45 seconds
-  const GAME_DURATION = 45;
+  // Total Timer Duration = 60 seconds
+  const GAME_DURATION = 60;
   const timeRemaining = Math.max(0, GAME_DURATION - elapsedTime);
 
   // Correctly Placed Count
   const correctCount = boardSlots.filter((p, idx) => p && p.id === idx).length;
 
-  // Initialize Puzzle: Scatter all jigsaw pieces directly onto the board matrix!
+  // Initialize Puzzle: Scatter all jigsaw pieces directly onto the board matrix (Freestyle!)
   useEffect(() => {
     initPuzzle();
   }, [gridConfig]);
@@ -80,33 +78,6 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
     }
     return () => clearInterval(interval);
   }, [isTimerRunning, isGameOver, elapsedTime]);
-
-  // Edge Shape Compatibility Checker for Border & Corner Slots
-  const isPieceCompatibleWithSlot = (piece, slotIdx, rows, cols) => {
-    if (!piece) return true;
-
-    const slotRow = Math.floor(slotIdx / cols);
-    const slotCol = slotIdx % cols;
-    const { top, right, bottom, left } = piece.edges;
-
-    // Top edge constraint: Top row MUST have top===0, non-top rows MUST NOT have top===0
-    if (slotRow === 0 && top !== 0) return false;
-    if (slotRow > 0 && top === 0) return false;
-
-    // Bottom edge constraint: Bottom row MUST have bottom===0, non-bottom rows MUST NOT have bottom===0
-    if (slotRow === rows - 1 && bottom !== 0) return false;
-    if (slotRow < rows - 1 && bottom === 0) return false;
-
-    // Left edge constraint: Left col MUST have left===0, non-left cols MUST NOT have left===0
-    if (slotCol === 0 && left !== 0) return false;
-    if (slotCol > 0 && left === 0) return false;
-
-    // Right edge constraint: Right col MUST have right===0, non-right cols MUST NOT have right===0
-    if (slotCol === cols - 1 && right !== 0) return false;
-    if (slotCol < cols - 1 && right === 0) return false;
-
-    return true;
-  };
 
   const initPuzzle = () => {
     // Pick random logo
@@ -143,75 +114,27 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
       }
     }
 
-    // Categorize pieces & slots into compatible edge groups (Corners, Top Edge, Bottom Edge, Left Edge, Right Edge, Inner)
-    const boardMatrix = new Array(total).fill(null);
+    // Shuffle pieces across all slots for freestyle gameplay
+    let shuffledPieces = [...createdPieces].sort(() => Math.random() - 0.5);
 
-    // Helper: Shuffle array in place
-    const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
-
-    // Group slots and pieces into 3 main categories: CORNERS, BORDER, and INNER
-    const categories = {
-      CORNERS: { slots: [], pieces: [] },
-      BORDER: { slots: [], pieces: [] },
-      INNER: { slots: [], pieces: [] }
-    };
-
-    for (let idx = 0; idx < total; idx++) {
-      const piece = createdPieces[idx];
-      const r = Math.floor(idx / cols);
-      const c = idx % cols;
-
-      const isCorner = (r === 0 || r === rows - 1) && (c === 0 || c === cols - 1);
-      const isBorder = !isCorner && (r === 0 || r === rows - 1 || c === 0 || c === cols - 1);
-
-      if (isCorner) {
-        categories.CORNERS.slots.push(idx);
-        categories.CORNERS.pieces.push(piece);
-      } else if (isBorder) {
-        categories.BORDER.slots.push(idx);
-        categories.BORDER.pieces.push(piece);
-      } else {
-        categories.INNER.slots.push(idx);
-        categories.INNER.pieces.push(piece);
-      }
+    let attempts = 0;
+    // Ensure 0% starting solved state
+    while (attempts < 100 && shuffledPieces.some((p, i) => p.id === i)) {
+      shuffledPieces = [...createdPieces].sort(() => Math.random() - 0.5);
+      attempts++;
     }
 
-    // Populate board slots with a guaranteed 0% solved start (0 checkmarks on init!)
-    Object.values(categories).forEach(({ slots, pieces }) => {
-      if (pieces.length === 0) return;
+    // Fallback: If random shuffle still has pieces in matching slots, shift offset by 1
+    if (shuffledPieces.some((p, i) => p.id === i)) {
+      shuffledPieces = createdPieces.map((_, i) => createdPieces[(i + 1) % createdPieces.length]);
+    }
 
-      let shuffledPieces = [...pieces].sort(() => Math.random() - 0.5);
-
-      let attempts = 0;
-      // Keep shuffling until EVERY piece in this group is misplaced (0 start solved!) AND physically compatible
-      while (
-        attempts < 250 &&
-        (shuffledPieces.some((p, i) => p.id === slots[i]) ||
-         shuffledPieces.some((p, i) => !isPieceCompatibleWithSlot(p, slots[i], rows, cols)))
-      ) {
-        shuffledPieces = [...pieces].sort(() => Math.random() - 0.5);
-        attempts++;
-      }
-
-      // Fallback: If random derangement didn't achieve 0 solved, shift array offset by 1
-      if (shuffledPieces.some((p, i) => p.id === slots[i])) {
-        const shifted = [];
-        for (let i = 0; i < pieces.length; i++) {
-          shifted.push(pieces[(i + 1) % pieces.length]);
-        }
-        shuffledPieces = shifted;
-      }
-
-      slots.forEach((slotIdx, i) => {
-        boardMatrix[slotIdx] = shuffledPieces[i];
-      });
-    });
-
-    setBoardSlots(boardMatrix);
+    setBoardSlots(shuffledPieces);
     setElapsedTime(0);
     setMovesCount(0);
     setSelectedSlot(null);
     setIsGameOver(false);
+    setIsVictoryAnimating(false);
     setIsTimerRunning(false); // Timer starts on first slot touch
     soundManager.playShuffleSound();
   };
@@ -271,7 +194,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
   };
 
   // Render SVG Jigsaw Piece for Board Swap Matrix
-  const JigsawTileSvg = ({ piece, currentSlotIdx, isSelected }) => {
+  const JigsawTileSvg = ({ piece, currentSlotIdx, isSelected, isVictoryAnimating }) => {
     const { rows, cols } = gridConfig;
     const tileW = 100;
     const tileH = 100;
@@ -290,7 +213,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
     return (
       <svg 
         viewBox="0 0 100 100" 
-        className={`w-full h-full overflow-visible pointer-events-none transition-all duration-200 ${
+        className={`w-full h-full overflow-visible pointer-events-none transition-all duration-500 ${
           isSelected 
             ? 'filter drop-shadow-[0_0_15px_rgba(16,185,129,0.95)] scale-105 z-30' 
             : isCorrect 
@@ -323,16 +246,17 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
           />
         </g>
 
-        {/* Solid Dark Black Jigsaw Cut Line Outline */}
+        {/* Solid Dark Black Jigsaw Cut Line Outline - Vanishes smoothly to transparent on victory! */}
         <path 
           d={pathD} 
           fill="none" 
-          stroke="#090d16" 
+          stroke={isVictoryAnimating ? 'transparent' : isSelected ? '#10b981' : '#090d16'} 
           strokeWidth={isSelected ? '3.5' : '2.2'} 
           strokeLinecap="round"
           strokeLinejoin="round"
+          className="transition-all duration-700"
         />
-        {isSelected && (
+        {isSelected && !isVictoryAnimating && (
           <path 
             d={pathD} 
             fill="none" 
@@ -340,7 +264,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
             strokeWidth="2.5" 
           />
         )}
-        {isCorrect && !isSelected && (
+        {isCorrect && !isSelected && !isVictoryAnimating && (
           <path 
             d={pathD} 
             fill="none" 
@@ -352,12 +276,12 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
     );
   };
 
-  // Handle Slot Tap / Swap Action
+  // Handle Slot Tap / Swap Action (Freestyle - any piece can swap with any other slot!)
   const handleSlotTap = (slotIdx) => {
-    if (isGameOver) return;
+    if (isGameOver || isVictoryAnimating) return;
     soundManager.init();
 
-    // Start 45s Countdown timer on first interaction
+    // Start 60s Countdown timer on first interaction
     if (!isTimerRunning) {
       setIsTimerRunning(true);
     }
@@ -370,28 +294,6 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
       // Deselect same piece
       setSelectedSlot(null);
     } else {
-      // Enforce Border & Corner Edge Shape Compatibility!
-      const pieceA = boardSlots[selectedSlot];
-      const pieceB = boardSlots[slotIdx];
-
-      const isAValidInB = isPieceCompatibleWithSlot(pieceA, slotIdx, gridConfig.rows, gridConfig.cols);
-      const isBValidInA = isPieceCompatibleWithSlot(pieceB, selectedSlot, gridConfig.rows, gridConfig.cols);
-
-      if (!isAValidInB || !isBValidInA) {
-        // Incompatible placement attempt! Reject swap & trigger warning feedback
-        setInvalidSlot(slotIdx);
-        setIncompatibleToast(true);
-        soundManager.playRedGateSound(false);
-
-        setTimeout(() => {
-          setInvalidSlot(null);
-          setIncompatibleToast(false);
-        }, 900);
-
-        setSelectedSlot(null);
-        return;
-      }
-
       // Swap pieces between selectedSlot and slotIdx!
       const newSlots = [...boardSlots];
       const temp = newSlots[selectedSlot];
@@ -407,10 +309,12 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
       const isSolved = newSlots.every((p, idx) => p.id === idx);
       if (isSolved) {
         setIsTimerRunning(false);
+        setIsVictoryAnimating(true);
         soundManager.playPuzzleCompleteSound();
 
-        const finishedUnder45 = elapsedTime < 45;
+        const finishedUnder60 = elapsedTime < 60;
 
+        // Outlines vanish for 3 seconds before proceeding directly to prize selection!
         setTimeout(() => {
           onGameComplete({
             timeSeconds: elapsedTime,
@@ -418,10 +322,10 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
             moves: movesCount + 1,
             gridSize: gridConfig.label,
             logoName: currentLogo.name,
-            eligibleForPrize: finishedUnder45,
+            eligibleForPrize: finishedUnder60,
             score: Math.max(300, 15000 - elapsedTime * 30 - (movesCount + 1) * 20)
           });
-        }, 800);
+        }, 3000);
       }
     }
   };
@@ -449,7 +353,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
               TIME'S UP! GAME OVER
             </h2>
             <p className="text-xs font-bold text-slate-500 mt-1 uppercase">
-              You ran out of time (45s) before solving the puzzle.
+              You ran out of time (60s) before solving the puzzle.
             </p>
 
             <div className="my-4 p-3 w-full rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-extrabold text-emerald-900 flex justify-around shadow-inner">
@@ -469,7 +373,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
                 onClick={initPuzzle}
                 className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-95 text-white font-black text-xs font-heading tracking-wider uppercase border border-emerald-300 shadow-md flex items-center justify-center gap-2 transition-all"
               >
-                <RotateCcw className="w-4 h-4" /> Try Again (45s Reset)
+                <RotateCcw className="w-4 h-4" /> Try Again (60s Reset)
               </button>
 
               <button
@@ -615,14 +519,13 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
                 if (!piece) return null;
                 const isSelected = selectedSlot === slotIdx;
                 const isCorrect = piece.id === slotIdx;
-                const isInvalid = invalidSlot === slotIdx;
 
                 return (
                   <div 
                     key={slotIdx}
                     onClick={() => handleSlotTap(slotIdx)}
                     className={`relative w-full h-full overflow-visible cursor-pointer transition-transform duration-150 ${
-                      isSelected ? 'z-30 scale-105' : isInvalid ? 'z-40 scale-105 animate-bounce' : 'hover:scale-[1.02]'
+                      isSelected ? 'z-30 scale-105' : 'hover:scale-[1.02]'
                     }`}
                   >
                     {/* SVG Vector Jigsaw Piece Tile */}
@@ -630,23 +533,19 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
                       piece={piece} 
                       currentSlotIdx={slotIdx} 
                       isSelected={isSelected} 
+                      isVictoryAnimating={isVictoryAnimating}
                     />
 
-                    {/* Green Checkmark Badge when Tile is in Correct Position */}
-                    {isCorrect && !isSelected && (
+                    {/* Green Checkmark Badge when Tile is in Correct Position (fades out on victory) */}
+                    {isCorrect && !isSelected && !isVictoryAnimating && (
                       <div className="absolute top-1 right-1 z-20 p-0.5 rounded-full bg-emerald-600 text-white shadow-sm pointer-events-none animate-fade-in">
                         <CheckCircle2 className="w-3 h-3" />
                       </div>
                     )}
 
                     {/* Selection Active Ring */}
-                    {isSelected && (
+                    {isSelected && !isVictoryAnimating && (
                       <div className="absolute inset-0 z-20 rounded-lg border-2 border-emerald-500 bg-emerald-500/10 pointer-events-none animate-pulse" />
-                    )}
-
-                    {/* Invalid Placement Rejection Ring */}
-                    {isInvalid && (
-                      <div className="absolute inset-0 z-20 rounded-lg border-2 border-rose-500 bg-rose-500/20 pointer-events-none animate-pulse" />
                     )}
                   </div>
                 );
@@ -659,11 +558,6 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
 
       {/* --- 4. BOTTOM INSTRUCTION BAR --- */}
       <div className="relative z-20 shrink-0 w-full max-w-sm mx-auto p-2 luxury-glass-card rounded-2xl text-center">
-        {incompatibleToast && (
-          <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1.5 rounded-full bg-rose-600 text-white text-[10px] font-extrabold uppercase tracking-wide shadow-lg animate-bounce shrink-0 whitespace-nowrap">
-            ⚠️ Incompatible Piece: Corner/border shapes must fit!
-          </div>
-        )}
         <p className="text-[10px] sm:text-xs font-black text-emerald-900 uppercase tracking-wide flex items-center justify-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-spin" /> Tap one piece, then tap another to swap them!
         </p>

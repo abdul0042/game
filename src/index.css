@@ -64,6 +64,26 @@
   100% { transform: translateX(200%); }
 }
 
+@keyframes unlockPopup {
+  0% { transform: scale(0.3) translateY(50px); opacity: 0; filter: blur(8px); }
+  60% { transform: scale(1.08) translateY(-6px); opacity: 1; filter: blur(0px); }
+  80% { transform: scale(0.98) translateY(0px); }
+  100% { transform: scale(1) translateY(0px); opacity: 1; }
+}
+
+@keyframes raysRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-unlock-popup {
+  animation: unlockPopup 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-rays-rotate {
+  animation: raysRotate 16s linear infinite;
+}
+
 .animate-float-slow {
   animation: floatSlow 3.5s ease-in-out infinite;
 }
@@ -119,4 +139,64 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(16, 185, 129, 0.6);
+}
+
+/* Modern Skeuomorphic Tactile Utility Classes */
+.skeuo-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 65%, #e6f5eb 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-bottom: 2.5px solid rgba(5, 150, 105, 0.3);
+  box-shadow: 
+    0 16px 36px -8px rgba(16, 185, 129, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.03),
+    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.95),
+    inset 0 -2.5px 5px rgba(16, 185, 129, 0.1);
+}
+
+.skeuo-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 
+    0 24px 50px -10px rgba(16, 185, 129, 0.28),
+    0 8px 20px rgba(0, 0, 0, 0.05),
+    inset 0 2px 1px rgba(255, 255, 255, 1),
+    inset 0 -2.5px 5px rgba(16, 185, 129, 0.15);
+}
+
+.skeuo-card:active {
+  transform: translateY(1px);
+  box-shadow: 
+    0 6px 16px -4px rgba(16, 185, 129, 0.15),
+    inset 0 2.5px 5px rgba(0, 0, 0, 0.08);
+}
+
+.skeuo-icon-box {
+  background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 8px 18px rgba(16, 185, 129, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -1.5px 3px rgba(0, 0, 0, 0.04);
+}
+
+.skeuo-pill {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-top: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 6px 14px rgba(16, 185, 129, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -1px 2px rgba(16, 185, 129, 0.08);
+}
+
+.skeuo-button-action {
+  background: linear-gradient(180deg, #10b981 0%, #059669 60%, #047857 100%);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 
+    0 6px 16px rgba(16, 185, 129, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
 }
