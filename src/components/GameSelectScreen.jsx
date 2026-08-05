@@ -32,41 +32,7 @@ export default function GameSelectScreen({ onSelectStacker, onSelectJigsaw, onOp
 
       {/* 2. GAME SELECTION CARDS (MODERN SKEUOMORPHIC ARCADE PODS) */}
       <div className="relative z-10 my-auto w-full max-w-sm flex flex-col gap-4">
-        {/* Game 1: Stack Your Tech Empire */}
-        <button
-          onClick={onSelectStacker}
-          className="group relative skeuo-card rounded-[28px] p-5 text-left transition-all duration-300 flex flex-col gap-2.5 overflow-hidden active:scale-98 cursor-pointer"
-        >
-          {/* Beveled Top Gloss Line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 opacity-90" />
-          
-          <div className="flex items-center justify-between">
-            <div className="skeuo-icon-box w-12 h-12 p-2 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden shrink-0">
-              <img src="/image copy.png" alt="Stack Your Tech Empire" className="w-full h-full object-contain" />
-            </div>
-
-            <div className="skeuo-button-action p-2.5 rounded-2xl text-white group-hover:scale-110 transition-transform flex items-center justify-center shadow-md">
-              <ArrowRight className="w-4 h-4 stroke-[3]" />
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-black text-emerald-800 bg-emerald-100/80 border border-emerald-300/80 px-2 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
-                TOWER BUILDER
-              </span>
-            </div>
-            <h3 className="text-lg sm:text-xl font-black font-sora text-slate-950 uppercase tracking-tight leading-tight">
-              1. Stack Your Tech Empire
-            </h3>
-          </div>
-          
-          <p className="text-xs text-slate-600 font-semibold leading-relaxed">
-            Tap to drop swinging tech modules (GoWhats, Billzzy, Ciphergate) and stack a skyscraper into space!
-          </p>
-        </button>
-
-        {/* Game 2: App Logo Jigsaw Puzzle */}
+        {/* Game 1: App Logo Jigsaw Puzzle */}
         <button
           onClick={onSelectJigsaw}
           className="group relative skeuo-card rounded-[28px] p-5 text-left transition-all duration-300 flex flex-col gap-2.5 overflow-hidden active:scale-98 cursor-pointer"
@@ -91,12 +57,46 @@ export default function GameSelectScreen({ onSelectStacker, onSelectJigsaw, onOp
               </span>
             </div>
             <h3 className="text-lg sm:text-xl font-black font-sora text-slate-950 uppercase tracking-tight leading-tight">
-              2. App Logo Jigsaw
+              1. App Logo Jigsaw
             </h3>
           </div>
           
           <p className="text-xs text-slate-600 font-semibold leading-relaxed">
             Piece together GoWhats, Billzzy, Ciphergate, and F3 Empire logos in custom grid difficulties!
+          </p>
+        </button>
+
+        {/* Game 2: Stack Your Tech Empire */}
+        <button
+          onClick={onSelectStacker}
+          className="group relative skeuo-card rounded-[28px] p-5 text-left transition-all duration-300 flex flex-col gap-2.5 overflow-hidden active:scale-98 cursor-pointer"
+        >
+          {/* Beveled Top Gloss Line */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 opacity-90" />
+          
+          <div className="flex items-center justify-between">
+            <div className="skeuo-icon-box w-12 h-12 p-2 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden shrink-0">
+              <img src="/image copy.png" alt="Stack Your Tech Empire" className="w-full h-full object-contain" />
+            </div>
+
+            <div className="skeuo-button-action p-2.5 rounded-2xl text-white group-hover:scale-110 transition-transform flex items-center justify-center shadow-md">
+              <ArrowRight className="w-4 h-4 stroke-[3]" />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-black text-emerald-800 bg-emerald-100/80 border border-emerald-300/80 px-2 py-0.5 rounded-md uppercase tracking-wider shadow-2xs">
+                TOWER BUILDER
+              </span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-black font-sora text-slate-950 uppercase tracking-tight leading-tight">
+              2. Stack Your Tech Empire
+            </h3>
+          </div>
+          
+          <p className="text-xs text-slate-600 font-semibold leading-relaxed">
+            Tap to drop swinging tech modules (GoWhats, Billzzy, Ciphergate) and stack a skyscraper into space!
           </p>
         </button>
       </div>

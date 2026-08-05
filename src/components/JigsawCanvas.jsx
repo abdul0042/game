@@ -493,7 +493,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
 
       {/* --- 3. CENTER GAME: SWAP JIGSAW PUZZLE BOARD MATRIX (LUXURY GLASS BOARD) --- */}
       <div className="relative z-10 flex-1 min-h-0 flex items-center justify-center my-0.5">
-        <div className="relative h-full max-h-[250px] sm:max-h-[280px] aspect-square luxury-glass-card rounded-[32px] p-2.5 border-2 border-emerald-300/80 shadow-2xl flex items-center justify-center overflow-hidden">
+        <div className="relative h-full max-h-[340px] sm:max-h-[380px] aspect-square luxury-glass-card rounded-[32px] p-2.5 border-2 border-emerald-300/80 shadow-2xl flex items-center justify-center overflow-hidden">
           
           {/* Board Matrix Inner Container */}
           <div className="relative w-full h-full overflow-hidden rounded-2xl bg-emerald-50/60 border border-emerald-200/80">
