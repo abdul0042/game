@@ -4,8 +4,6 @@ import StartScreen from './components/StartScreen';
 import GameCanvas from './components/GameCanvas';
 import HUD from './components/HUD';
 import ScoreScreen from './components/ScoreScreen';
-import StackerCanvas from './components/StackerCanvas';
-import StackerScoreScreen from './components/StackerScoreScreen';
 import JigsawCanvas from './components/JigsawCanvas';
 import JigsawScoreScreen from './components/JigsawScoreScreen';
 import PrizeWheelModal from './components/PrizeWheelModal';
@@ -27,13 +25,10 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const [runnerScoreData, setRunnerScoreData] = useState({ score: 0, squadCount: 5 });
-  const [stackerScoreData, setStackerScoreData] = useState({ score: 0, floorsCount: 0, heightMeters: 0, wonPrize: null });
   const [jigsawScoreData, setJigsawScoreData] = useState({ timeSeconds: 0, moves: 0, gridSize: '4x4', logoName: 'Random Logo', score: 0, wonPrize: null });
 
   // Prize Reel Modal State
   const [showPrizeWheel, setShowPrizeWheel] = useState(false);
-  const [prizeSourceGame, setPrizeSourceGame] = useState(null); // 'STACKER' or 'JIGSAW'
-  const [pendingStackerData, setPendingStackerData] = useState(null);
   const [pendingJigsawData, setPendingJigsawData] = useState(null);
 
   const [leaderboard, setLeaderboard] = useState(() => {
@@ -64,14 +59,6 @@ export default function App() {
     setScreen('RUNNER_PLAY');
   };
 
-  const handleStartStacker = () => {
-    soundManager.init();
-    setStackerScoreData({ score: 0, floorsCount: 0, heightMeters: 0, wonPrize: null });
-    setPendingStackerData(null);
-    setShowPrizeWheel(false);
-    setScreen('STACKER_PLAY');
-  };
-
   const handleStartJigsaw = () => {
     soundManager.init();
     setJigsawScoreData({ timeSeconds: 0, moves: 0, gridSize: settings.jigsawGrid?.label || '4×4', logoName: 'Random Logo', score: 0, wonPrize: null });
@@ -85,21 +72,9 @@ export default function App() {
     setScreen('RUNNER_SCORE');
   };
 
-  const handleStackerComplete = (data) => {
-    if (data.floorsCount >= 15) {
-      setPendingStackerData(data);
-      setPrizeSourceGame('STACKER');
-      setShowPrizeWheel(true);
-    } else {
-      setStackerScoreData(data);
-      setScreen('STACKER_SCORE');
-    }
-  };
-
   const handleJigsawComplete = (data) => {
     if (data.eligibleForPrize) {
       setPendingJigsawData(data);
-      setPrizeSourceGame('JIGSAW');
       setShowPrizeWheel(true);
     } else {
       setJigsawScoreData(data);
@@ -109,22 +84,12 @@ export default function App() {
 
   const handleClaimPrize = (wonPrize) => {
     setShowPrizeWheel(false);
-
-    if (prizeSourceGame === 'JIGSAW') {
-      const finalData = {
-        ...(pendingJigsawData || {}),
-        wonPrize
-      };
-      setJigsawScoreData(finalData);
-      setScreen('JIGSAW_SCORE');
-    } else {
-      const finalData = {
-        ...(pendingStackerData || {}),
-        wonPrize
-      };
-      setStackerScoreData(finalData);
-      setScreen('STACKER_SCORE');
-    }
+    const finalData = {
+      ...(pendingJigsawData || {}),
+      wonPrize
+    };
+    setJigsawScoreData(finalData);
+    setScreen('JIGSAW_SCORE');
   };
 
   const handleSaveScore = (entry) => {
@@ -149,51 +114,34 @@ export default function App() {
   };
 
   return (
-    <div className="w-full h-full h-[100dvh] bg-slate-950 flex items-center justify-center overflow-hidden">
+    <div className="w-full h-full h-[100dvh] bg-gradient-to-b from-emerald-50/60 via-slate-50 to-teal-50/60 md:bg-slate-950 flex items-center justify-center overflow-hidden p-0 md:p-4">
+      {/* Ambient Glow for Desktop Kiosk View */}
+      {settings.aspectMode === 'kiosk' && (
+        <div className="hidden md:block absolute w-[460px] h-[860px] bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+      )}
+
       <div 
         className={`relative overflow-hidden transition-all duration-300 ${
           settings.aspectMode === 'kiosk'
-            ? 'w-full h-full sm:max-w-[480px] sm:h-[96vh] sm:max-h-[920px] rounded-none sm:rounded-3xl border-0 sm:border-4 border-white/20 shadow-[0_20px_60px_-15px_rgba(14,165,233,0.3)] bg-slate-50'
-            : 'w-full h-full bg-slate-50'
+            ? 'w-full h-full md:max-w-[430px] md:h-[94vh] md:max-h-[860px] rounded-none md:rounded-3xl border-0 md:border-2 md:border-emerald-300/80 shadow-none md:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5),0_0_30px_rgba(16,185,129,0.2)] bg-slate-50 flex flex-col'
+            : 'w-full h-full bg-slate-50 flex flex-col'
         }`}
       >
-        {/* --- MAIN GAME SELECT SUITE --- */}
+        {/* --- MAIN GAME PORTAL: APP LOGO JIGSAW --- */}
         {screen === 'GAME_SELECT' && (
           <GameSelectScreen 
-            onSelectRunner={() => setScreen('RUNNER_START')}
-            onSelectStacker={handleStartStacker}
             onSelectJigsaw={handleStartJigsaw}
             onOpenLeaderboard={() => setIsLeaderboardOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
           />
         )}
 
-        {/* --- GAME 1: STACK YOUR TECH EMPIRE (CRANE TOWER BOX GAME) --- */}
-        {screen === 'STACKER_PLAY' && (
-          <StackerCanvas 
-            gameDurationSeconds={settings.duration}
-            isMuted={settings.isMuted}
-            onGameComplete={handleStackerComplete}
-            onBack={() => setScreen('GAME_SELECT')}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-          />
-        )}
-
-        {/* Prize Wheel Modal Triggered when 15+ Floors built OR Jigsaw completed < 30s */}
+        {/* Prize Wheel Modal Triggered when Jigsaw completed < 30s */}
         {showPrizeWheel && (
           <PrizeWheelModal onClaimPrize={handleClaimPrize} />
         )}
 
-        {screen === 'STACKER_SCORE' && (
-          <StackerScoreScreen 
-            scoreData={stackerScoreData}
-            onReplay={handleStartStacker}
-            onHome={() => setScreen('GAME_SELECT')}
-            onSaveScore={handleSaveScore}
-          />
-        )}
-
-        {/* --- GAME 2: SCALE YOUR TECH (3D RUNNER) --- */}
+        {/* --- OPTIONAL 3D RUNNER (CAN STILL BE ACCESSED VIA SETTINGS IF NEEDED) --- */}
         {screen === 'RUNNER_START' && (
           <StartScreen 
             onStartGame={handleStartRunner}
@@ -229,7 +177,7 @@ export default function App() {
           />
         )}
 
-        {/* --- GAME 3: APP LOGO JIGSAW PUZZLE --- */}
+        {/* --- PRIMARY GAME: APP LOGO JIGSAW PUZZLE --- */}
         {screen === 'JIGSAW_PLAY' && (
           <JigsawCanvas 
             settings={settings}
@@ -262,7 +210,6 @@ export default function App() {
             onUpdateSettings={handleUpdateSettings}
             onResetLeaderboard={handleResetLeaderboard}
             onSwitchToRunner={() => setScreen('RUNNER_START')}
-            onSwitchToStacker={handleStartStacker}
             onSwitchToJigsaw={handleStartJigsaw}
             onSwitchToSelect={() => setScreen('GAME_SELECT')}
             currentScreen={screen}

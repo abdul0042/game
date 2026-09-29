@@ -31,7 +31,7 @@ export default function JigsawScoreScreen({ scoreData, onReplay, onHome, onSaveS
   };
 
   return (
-    <div className="relative w-full h-full h-[100dvh] flex flex-col items-center justify-between p-4 bg-gradient-to-b from-emerald-50 via-white to-teal-50 text-slate-900 overflow-hidden text-center font-sans select-none">
+    <div className="relative w-full h-full flex flex-col items-center justify-between p-4 sm:p-5 pt-3 sm:pt-4 bg-gradient-to-b from-emerald-50 via-white to-teal-50 text-slate-900 overflow-y-auto overflow-x-hidden text-center font-sans select-none">
       {/* Ambient Glow */}
       <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 via-white to-teal-500/10 pointer-events-none" />
 

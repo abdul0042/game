@@ -339,7 +339,7 @@ export default function JigsawCanvas({ settings, onGameComplete, onBack, onOpenS
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-full h-[100dvh] flex flex-col justify-between p-2.5 bg-gradient-to-b from-emerald-50/70 via-white to-teal-50/60 text-slate-900 font-sans select-none overflow-hidden"
+      className="relative w-full h-full flex flex-col justify-between p-2.5 sm:p-3 bg-gradient-to-b from-emerald-50/70 via-white to-teal-50/60 text-slate-900 font-sans select-none overflow-hidden"
     >
       {/* --- GAME OVER MODAL OVERLAY --- */}
       {isGameOver && (

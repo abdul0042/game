@@ -1,11 +1,10 @@
 import React from 'react';
-import { X, Sliders, Monitor, Volume2, Trash2, Gamepad2, Building2, Puzzle, LayoutGrid, Grid, Home } from 'lucide-react';
+import { X, Sliders, Monitor, Volume2, Trash2, Puzzle, Grid, Home, Play } from 'lucide-react';
 
 export default function SettingsModal({ 
   settings, 
   onUpdateSettings, 
   onResetLeaderboard, 
-  onSwitchToStacker,
   onSwitchToJigsaw,
   onSwitchToSelect,
   currentScreen,
@@ -32,56 +31,50 @@ export default function SettingsModal({
 
         {/* Settings Options */}
         <div className="flex flex-col gap-5 text-left">
-          {/* MORE GAMES SECTION */}
+          {/* ACTIVE GAME QUICK LAUNCH / HOME */}
           <div className="flex flex-col gap-2 p-3.5 rounded-2xl bg-emerald-50/80 border-2 border-emerald-300 shadow-sm">
-            <label className="text-xs font-black text-emerald-900 uppercase flex items-center gap-2">
-              <Gamepad2 className="w-4 h-4 text-emerald-600" /> SWITCH KIOSK GAME
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black text-emerald-900 uppercase flex items-center gap-2">
+                <Puzzle className="w-4 h-4 text-emerald-600" /> APP LOGO JIGSAW
+              </label>
+              <span className="text-[10px] font-black uppercase text-emerald-800 bg-emerald-200/80 px-2 py-0.5 rounded-md">
+                Active Game
+              </span>
+            </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  if (onSwitchToStacker) onSwitchToStacker();
-                }}
-                className={`py-3 px-3 rounded-xl text-center flex flex-col items-center gap-1 border transition-all ${
-                  currentScreen?.includes('STACKER')
-                    ? 'border-emerald-500 bg-emerald-100 text-emerald-900 font-black shadow-sm'
-                    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 font-bold'
-                }`}
-              >
-                <Building2 className="w-5 h-5 text-emerald-600" />
-                <span className="text-xs leading-tight uppercase font-extrabold">Tower Stacker</span>
-              </button>
-
+            <div className="grid grid-cols-2 gap-2 mt-1">
               <button
                 type="button"
                 onClick={() => {
                   onClose();
                   if (onSwitchToJigsaw) onSwitchToJigsaw();
                 }}
-                className={`py-3 px-3 rounded-xl text-center flex flex-col items-center gap-1 border transition-all ${
+                className={`py-2.5 px-3 rounded-xl text-center flex items-center justify-center gap-1.5 border transition-all text-xs font-extrabold uppercase ${
                   currentScreen?.includes('JIGSAW')
-                    ? 'border-emerald-500 bg-emerald-100 text-emerald-900 font-black shadow-sm'
-                    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 font-bold'
+                    ? 'border-emerald-500 bg-emerald-600 text-white shadow-sm'
+                    : 'border-emerald-300 bg-white text-emerald-950 hover:bg-emerald-50'
                 }`}
               >
-                <Puzzle className="w-5 h-5 text-emerald-600" />
-                <span className="text-xs leading-tight uppercase font-extrabold">Logo Jigsaw</span>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Play Puzzle</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onSwitchToSelect) onSwitchToSelect();
+                }}
+                className={`py-2.5 px-3 rounded-xl text-center flex items-center justify-center gap-1.5 border transition-all text-xs font-extrabold uppercase ${
+                  currentScreen === 'GAME_SELECT'
+                    ? 'border-emerald-500 bg-emerald-600 text-white shadow-sm'
+                    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <Home className="w-3.5 h-3.5" />
+                <span>Home Screen</span>
               </button>
             </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                if (onSwitchToSelect) onSwitchToSelect();
-              }}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
-            >
-              <Home className="w-4 h-4" /> Go to Home Screen (Game Select)
-            </button>
           </div>
 
           {/* JIGSAW GRID SIZE SETTING */}
